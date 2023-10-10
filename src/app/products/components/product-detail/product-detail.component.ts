@@ -14,6 +14,8 @@ import { ProductsService } from '../../../services/product.service';
 export class ProductDetailComponent implements OnInit {
 
   product: Product | null = null;
+  status: 'loading' | 'error' | 'success' | 'init' = 'init';
+  typeCustomer: string | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -31,18 +33,23 @@ export class ProductDetailComponent implements OnInit {
           this.goToBack();
         }
       });
+    this.route.queryParamMap.subscribe(params => {
+      this.typeCustomer = params.get('type');
+    })
   }
 
   private getProductDetail(productId: string) {
+    this.status = 'loading';
     this.productsService.getOne(productId)
-    .subscribe({
-      next: (product) => {
-        this.product = product;
-      },
-      error: () => {
-        this.goToBack();
-      }
-    })
+      .subscribe({
+        next: (product) => {
+          this.product = product;
+          this.status = 'success';
+        },
+        error: () => {
+          this.goToBack();
+        }
+      })
   }
 
   goToBack() {
